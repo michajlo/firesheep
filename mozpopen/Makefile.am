@@ -15,8 +15,8 @@ clean:
 
 .PHONY: vcbuild
 endif
-if PLATFORM_OSX
 SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
+if PLATFORM_OSX
 PLAT_DEST = $(top_builddir)/xpi/platform/Darwin_x86-gcc3/components
 CFLAGS  += -Iunix/ -I.
 COMPONENT_NAME = MozPopen
@@ -40,7 +40,6 @@ clean:
 	rm -f $(COMPONENT).xpt $(COMPONENT).dylib
 endif
 if PLATFORM_LINUX
-SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
 PLAT_DEST = $(top_builddir)/xpi/platform/Linux_x86_64-gcc3/components
 CFLAGS  += -Iunix/ -I.
 COMPONENT_NAME = MozPopen
