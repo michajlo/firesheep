@@ -38,33 +38,51 @@ var Firesheep = {
   
   _results: null,
   
+  _myDir: null,
+  
   load: function () {
     if (!this._loaded) {
-      this.config.load();
-      
-      this.clearSession();
-     
-      var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
-      if (!prefs.prefHasUserValue('firesheep.capture_interface')) {
-        var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
-        if (osString == 'Darwin') {
-          prefs.setCharPref('firesheep.capture_interface', 'en1');
-        } else {
-          for (var id in this.networkInterfaces) {
-            prefs.setCharPref('firesheep.capture_interface', id);
-            break;
-          }
-        }
-      }
-      
       this._loaded = true;
       
-      // Watch for config changes.
-      Observers.add('FiresheepConfig', function (data) {
-        if (data.action == 'scripts_changed')
-          Firesheep.reloadScripts();
-      });
-    }
+      if ("@mozilla.org/extensions/manager;1" in Cc) {
+        var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
+        var file = em.getInstallLocation('firesheep@codebutler.com').location;
+        file.append('firesheep@codebutler.com');
+        Firesheep._myDir = file;
+        this._finishLoading();
+      } else { /* FF 4 */
+        Components.utils.import("resource://gre/modules/AddonManager.jsm");
+        AddonManager.getAddonByID('firesheep@codebutler.com', function (addon) {
+          Firesheep._myDir = addon.getResourceURI('/').QueryInterface(Components.interfaces.nsIFileURL).file;
+          this._finishLoading();
+        });
+      }
+    }  
+  },
+  
+  _finishLoading: function () {      
+    this.config.load();
+    
+    this.clearSession();
+   
+    var prefs = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefBranch);
+    if (!prefs.prefHasUserValue('firesheep.capture_interface')) {
+      var osString = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime).OS;  
+      if (osString == 'Darwin') {
+        prefs.setCharPref('firesheep.capture_interface', 'en1');
+      } else {
+        for (var id in this.networkInterfaces) {
+          prefs.setCharPref('firesheep.capture_interface', id);
+          break;
+        }
+      }
+    }      
+    
+    // Watch for config changes.
+    Observers.add('FiresheepConfig', function (data) {
+      if (data.action == 'scripts_changed')
+        Firesheep.reloadScripts();
+    });
   },
   
   /*
@@ -163,9 +181,7 @@ var Firesheep = {
   },
   
   get _scriptsDir () {
-    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-    var file = em.getInstallLocation('firesheep@codebutler.com').location;
-    file.append('firesheep@codebutler.com');
+    var file = this._myDir.clone();
     file.append('handlers');
     return file;
   },
@@ -184,14 +200,11 @@ var Firesheep = {
     return builtinScripts;
   },
   
-  get backendPath () {
-    var em = Cc["@mozilla.org/extensions/manager;1"].getService(Ci.nsIExtensionManager);
-    
+  get backendPath () {    
     var xulRuntime = Cc["@mozilla.org/xre/app-info;1"].getService(Ci.nsIXULRuntime);
     var platformName = [ xulRuntime.OS, xulRuntime.XPCOMABI ].join('_');
 
-    var file = em.getInstallLocation("firesheep@codebutler.com").location;
-    file.append("firesheep@codebutler.com");
+    var file = this._myDir.clone();
     file.append("platform");
     file.append(platformName);
     if (xulRuntime.OS == "WINNT") {

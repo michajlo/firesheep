@@ -1,11 +1,19 @@
 //
+<<<<<<< HEAD
 // linux_platform.h: Linux functions, though more unix/pcap general
+=======
+// linux_platform.h: Linux functions
+>>>>>>> upstream/master
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
+<<<<<<< HEAD
 //   Michajlo Matijkiw
+=======
+//   Michajlo Matijkiw <michajlo.matijkiw@gmail.com>
+>>>>>>> upstream/master
 //   Eric Butler <eric@codebutler.com>
 //
 // This program is free software: you can redistribute it and/or modify

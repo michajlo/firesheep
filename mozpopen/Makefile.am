@@ -16,9 +16,9 @@ clean:
 .PHONY: vcbuild
 endif
 if PLATFORM_OSX
-SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
+SOURCES_OSX  = MozPopenModule.cpp unix/MozPopenProcess.cpp
 PLAT_DEST = $(top_builddir)/xpi/platform/Darwin_x86-gcc3/components
-CFLAGS  += -Iunix/ -I.
+CFLAGS  += -I $(top_builddir)/mozpopen -I $(top_builddir)/mozpopen/unix
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt
 LIB = $(PLAT_DEST)/$(COMPONENT_NAME).dylib
@@ -32,17 +32,23 @@ $(XPT): $(COMPONENT_NAME).idl
 	mkdir -p $(DEST)
 	$(XPIDL) -m typelib $(XPIDL_FLAGS) -e $@ $(COMPONENT_NAME).idl
 
-$(LIB): $(SOURCES)
+$(LIB): $(SOURCES_OSX)
 	mkdir -p $(PLAT_DEST)
-	$(CXX) -shared -fno-rtti -fPIC $(SOURCES) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
+	$(CXX) -shared -fno-rtti -fPIC $(SOURCES_OSX) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
 
 clean:
 	rm -f $(COMPONENT).xpt $(COMPONENT).dylib
 endif
 if PLATFORM_LINUX
+<<<<<<< HEAD
 SOURCES  = MozPopenModule.cpp unix/MozPopenProcess.cpp
 PLAT_DEST = $(top_builddir)/xpi/platform/Linux_$(build_cpu)-gcc3/components
 CFLAGS  += -Iunix/ -I.
+=======
+SOURCES_LINUX  = MozPopenModule.cpp unix/MozPopenProcess.cpp
+PLAT_DEST = $(top_builddir)/xpi/platform/Linux_$(BUILD_ARCH)-gcc3/components
+CFLAGS  += -I $(top_builddir)/mozpopen -I $(top_builddir)/mozpopen/unix
+>>>>>>> upstream/master
 COMPONENT_NAME = MozPopen
 XPT = $(DEST)/$(COMPONENT_NAME).xpt
 LIB = $(PLAT_DEST)/$(COMPONENT_NAME).so
@@ -56,9 +62,15 @@ $(XPT): $(COMPONENT_NAME).idl
 	mkdir -p $(DEST)
 	$(XPIDL) -m typelib $(XPIDL_FLAGS) -e $@ $(COMPONENT_NAME).idl
 
+<<<<<<< HEAD
 $(LIB): $(SOURCES)
 	mkdir -p $(PLAT_DEST)
 	$(CXX) -shared -fno-rtti -fPIC $(SOURCES) $(CFLAGS) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
+=======
+$(LIB): $(SOURCES_LINUX)
+	mkdir -p $(PLAT_DEST)
+	$(CXX) -shared -fno-rtti -fPIC $(SOURCES_LINUX) $(CFLAGS) $(BUILD_TARGET) $(MOZ_CFLAGS) $(MOZ_LIBS) -o $@
+>>>>>>> upstream/master
 
 clean:
 	rm -f $(COMPONENT).xpt $(COMPONENT).so

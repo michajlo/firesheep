@@ -46,7 +46,11 @@ int main(int argc, const char *argv[])
   WindowsPlatform platform(sargv);
 #elif PLATFORM_OSX
   OSXPlatform platform(sargv);
+<<<<<<< HEAD
 #else
+=======
+#elif PLATFORM_LINUX
+>>>>>>> upstream/master
   LinuxPlatform platform(sargv);
 #endif
   
