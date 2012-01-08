@@ -1,19 +1,10 @@
 //
-<<<<<<< HEAD
-// linux_platform.h: Linux functions, though more unix/pcap general
-=======
-// linux_platform.h: Linux functions
->>>>>>> upstream/master
+// firesheep_platform.hpp
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
-<<<<<<< HEAD
-//   Michajlo Matijkiw
-=======
-//   Michajlo Matijkiw <michajlo.matijkiw@gmail.com>
->>>>>>> upstream/master
 //   Eric Butler <eric@codebutler.com>
 //
 // This program is free software: you can redistribute it and/or modify
@@ -29,17 +20,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#ifndef FIRESHEEP_LINUX_PLATFORM_H
-#define FIRESHEEP_LINUX_PLATFORM_H
+#include "abstract_platform.hpp"
 
-#include "unix_platform.hpp"
-#include "interface_info.hpp"
-
-class LinuxPlatform : public UnixPlatform {
-public:
-  LinuxPlatform(string);
-  bool run_privileged();
-  vector<InterfaceInfo> interfaces();
-};
-
+#ifdef PLATFORM_WIN32
+#include "windows_platform.hpp"
+#define PLATFORM WindowsPlatform
+#elif PLATFORM_OSX
+#include "osx_platform.hpp"
+#define PLATFORM OSXPlatform
+#elif PLATFORM_LINUX
+#include "linux_platform.hpp"
+#define PLATFORM LinuxPlatform
+#else
+#error "no suitable platform"
 #endif

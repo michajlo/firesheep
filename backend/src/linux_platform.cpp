@@ -1,21 +1,13 @@
 //
-<<<<<<< HEAD
-// linux_platform.cpp: Linux functions, though more unix/pcap general
-=======
 // linux_platform.cpp: Linux functions
->>>>>>> upstream/master
 // Part of the Firesheep project.
 //
 // Copyright (C) 2010 Eric Butler
 //
 // Authors:
-<<<<<<< HEAD
-//   Michajlo Matijkiw
-=======
 //   Michajlo Matijkiw <michajlo.matijkiw@gmail.com>
 //   Nick Kossifidis <mickflemm@gmail.com>
 //   Eric Butler <eric@codebutler.com>
->>>>>>> upstream/master
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,12 +22,6 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-<<<<<<< HEAD
-#include <stdio.h>
-#include <pcap/pcap.h>
-#include "linux_platform.hpp"
-
-=======
 #include <iostream>
 #include <cstdio>
 #include <pcap/pcap.h>
@@ -44,61 +30,45 @@
 
 using namespace std;
 using namespace boost;
->>>>>>> upstream/master
 
-LinuxPlatform::LinuxPlatform(vector<string> argv) : UnixPlatform(argv) { }
+LinuxPlatform::LinuxPlatform(string path) : UnixPlatform(path) { }
 
-bool LinuxPlatform::run_privileged() {
-<<<<<<< HEAD
-    return true;
-=======
-  const char *path = this->path().c_str();
-  execl("/usr/bin/pkexec", "pkexec", path, "--fix-permissions", NULL);
-  return true;
+bool LinuxPlatform::run_privileged() 
+{
+  string cmd = string("/usr/bin/pkexec ");
+  cmd += this->path();
+  cmd += " --fix-permissions";
+
+  int ret = system(cmd.c_str());
+  return (ret == 0);
 }
 
 string device_get_property_string(LibHalContext *context, string device, string key, DBusError *error)
 {
   char *buf = libhal_device_get_property_string(context, device.c_str(), key.c_str(), error);
+
+  string property;
   if (dbus_error_is_set(error)) {
-    runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
-    dbus_error_free(error);
-    throw ex;
+    if (key.compare(0, 5, "info.") != 0) {
+      runtime_error ex(str(format("libhal_device_get_property_string failed: %s %s") % error->name % error->message));
+      dbus_error_free(error);
+      throw ex;
+    }
+    else {
+      dbus_error_free(error);
+      property = "Unknown";
+    }
   }
-  return string(buf);
->>>>>>> upstream/master
+  else {
+    property = string(buf);
+  }
+
+  return property;
 }
 
 vector<InterfaceInfo> LinuxPlatform::interfaces()
 {
   vector<InterfaceInfo> result;
-<<<<<<< HEAD
-  char err_buff[PCAP_ERRBUF_SIZE];
-  pcap_if_t *all_devs;
-  if (pcap_findalldevs(&all_devs, err_buff) == 0) {
-    pcap_if_t *dev = all_devs;
-    while (dev) {
-      pcap_t *interface = pcap_open_live(dev->name, 1024 ,1, 100, err_buff);
-
-      if (interface == NULL) {
-        dev = dev->next;
-        continue;
-      }
-
-      if (pcap_datalink(interface) == DLT_EN10MB) {
-        const char *description = (dev->description) ? dev->description : dev->name;
-        InterfaceInfo info(dev->name, description, "ethernet");
-        result.push_back(info);
-      }
-
-      pcap_close(interface);
-      dev = dev->next;
-    }
-    pcap_freealldevs(all_devs);
-  }
-  return result; 
-}
-=======
   
   DBusError     error;
   LibHalContext *context;
@@ -179,4 +149,3 @@ vector<InterfaceInfo> LinuxPlatform::interfaces()
   return result; 
 }
 
->>>>>>> upstream/master
